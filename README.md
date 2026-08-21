@@ -31,3 +31,14 @@ Open `index.html` in a modern browser, or use a local static server.
 
 ## Important
 The application data is stored locally in the browser. It is not automatically shared between different phones or browsers.
+
+
+## v4 Updates
+- No default personal name in the greeting; the user's saved profile name is shown only after they set it.
+- Expense confirmation alert showing the amount spent and remaining budget.
+- Budget warning at 80% and exceeded at 100%.
+- Optional browser notifications for budget milestones.
+- Payment method defaults to `Choose payment` and must be selected.
+- Dark/light mode toggle.
+- Contact Owner section with email and phone.
+- JSON backup export and clear-data controls.

@@ -1,7 +1,9 @@
 const KEY="cashv_v3_expenses", BKEY="cashv_v3_budget", PKEY="cashv_v3_profile";
 let expenses=JSON.parse(localStorage.getItem(KEY)||"[]");
 let budget=Number(localStorage.getItem(BKEY)||20000);
-let profile=JSON.parse(localStorage.getItem(PKEY)||JSON.stringify({name:"Vandan Parekh",age:"",gender:"",phone:"",email:"",city:""}));
+let profile=JSON.parse(localStorage.getItem(PKEY)||JSON.stringify({name:"",age:"",gender:"",phone:"",email:"",city:""}));
+let theme=localStorage.getItem("cashv_theme")||"dark";
+let budgetAlerts=localStorage.getItem("cashv_budget_alerts")!=="off";
 
 const $=id=>document.getElementById(id);
 const COLORS=["#54c85a","#2d78dc","#a04bd0","#ed9d2c","#e95b7d","#58b7b0","#d9c25b","#8d9294"];
@@ -13,7 +15,10 @@ function monthKey(d=new Date()){return d.toISOString().slice(0,7)}
 function currentMonthExpenses(){return expenses.filter(x=>x.date?.slice(0,7)===monthKey())}
 function save(){localStorage.setItem(KEY,JSON.stringify(expenses));render()}
 function fmtDate(s){if(!s)return "";return new Date(s+"T00:00:00").toLocaleDateString("en-IN",{day:"2-digit",month:"short",year:"numeric"})}
-function toast(msg){$("toast").textContent=msg;$("toast").classList.remove("hidden");setTimeout(()=>$("toast").classList.add("hidden"),1800)}
+function toast(msg){$("toast").textContent=msg;$("toast").classList.remove("hidden");setTimeout(()=>$("toast").classList.add("hidden"),2200)}
+function applyTheme(){document.body.classList.toggle("light",theme==="light");const icon=theme==="light"?"☀":"☾";$("themeBtn").textContent=icon;$("settingsThemeBtn").textContent=icon;$("themeLabel").textContent=theme==="light"?"Light mode":"Dark mode";localStorage.setItem("cashv_theme",theme);drawDonut(currentMonthExpenses());drawTrend()}
+function showBudgetAlert(title,message){let old=document.querySelector(".budget-alert");if(old)old.remove();const box=document.createElement("div");box.className="budget-alert";box.innerHTML=`<h3>💰 ${title}</h3><p>${escapeHtml(message)}</p><button>Got it</button>`;box.querySelector("button").onclick=()=>box.remove();document.body.appendChild(box);setTimeout(()=>box.remove(),7000);if("Notification" in window&&Notification.permission==="granted"){new Notification("CashV — "+title,{body:message,icon:"icons/icon-192.png"})}}
+function budgetStatus(total){if(!budgetAlerts||budget<=0)return;const pct=total/budget*100;if(pct>=100){showBudgetAlert("Budget exceeded",`You have spent ${money0(total)} against your ${money0(budget)} monthly budget.`)}else if(pct>=80){showBudgetAlert("Budget warning",`You have used ${Math.round(pct)}% of your budget. ${money0(Math.max(0,budget-total))} is remaining.`)}}
 
 function switchScreen(id){
   document.querySelectorAll(".screen").forEach(s=>s.classList.toggle("active",s.id===id));
@@ -22,15 +27,20 @@ function switchScreen(id){
   window.scrollTo({top:0,behavior:"smooth"});
 }
 document.querySelectorAll(".nav-item").forEach(b=>b.onclick=()=>switchScreen(b.dataset.screen));
-$("menuBtn").onclick=()=>toast("CashV menu is ready for future settings.");
-$("notifyBtn").onclick=()=>toast("No new alerts.");
+$("menuBtn").onclick=()=>switchScreen("settingsScreen");
+$("themeBtn").onclick=()=>{theme=theme==="dark"?"light":"dark";applyTheme()};
+$("settingsThemeBtn").onclick=()=>{theme=theme==="dark"?"light":"dark";applyTheme()};
+$("budgetAlertsToggle").onclick=()=>{budgetAlerts=!budgetAlerts;localStorage.setItem("cashv_budget_alerts",budgetAlerts?"on":"off");render();toast(budgetAlerts?"Budget alerts enabled":"Budget alerts disabled")};
+$("enableNotificationsBtn").onclick=async()=>{if(!(typeof Notification!=="undefined")){toast("Browser notifications are not supported here.");return}const perm=await Notification.requestPermission();$("notifyLabel").textContent=perm==="granted"?"Notifications enabled":"Notifications not enabled";toast(perm==="granted"?"Notifications enabled":"Notification permission not granted")};
 $("profileBack").onclick=()=>switchScreen("homeScreen");
 $("viewAllBtn").onclick=()=>switchScreen("analyticsScreen");
 
 function render(){
   const now=new Date(), h=now.getHours();
   $("dayPart").textContent=h<12?"Morning":h<17?"Afternoon":"Evening";
-  $("greetName").textContent=(profile.name||"there").split(" ")[0];
+  const hasName=Boolean((profile.name||"").trim());
+  $("greetingNameWrap").style.display=hasName?"inline":"none";
+  $("greetName").textContent=hasName?profile.name.split(" ")[0]:"";
   const m=currentMonthExpenses(), total=m.reduce((s,x)=>s+x.amount,0);
   const today=new Date().toISOString().slice(0,10), todayTotal=expenses.filter(x=>x.date===today).reduce((s,x)=>s+x.amount,0);
   $("balanceValue").textContent=money(Math.max(0,budget-total));
@@ -38,6 +48,7 @@ function render(){
   $("donutTotal").textContent=money0(total);
   $("monthLabel").textContent=new Date().toLocaleDateString("en-IN",{month:"long",year:"numeric"});
   renderCategories(m);renderTransactions(m);renderBudget(total);renderAnalytics(m);renderProfile();
+  $("budgetAlertsToggle").classList.toggle("active",budgetAlerts);
   drawDonut(m);
 }
 
@@ -104,8 +115,10 @@ $("changeBudgetBtn").onclick=()=>{$("budgetInput").value=budget;$("budgetModal")
 document.querySelectorAll("[data-close]").forEach(b=>b.onclick=()=>$(b.dataset.close).classList.add("hidden"));
 $("saveExpense").onclick=()=>{
   const amount=Number($("amountInput").value);if(!amount||amount<0){toast("Enter a valid amount.");return}
+  if(!$("methodInput").value){toast("Please choose a payment method.");$("methodInput").focus();return}
   expenses.push({amount,category:$("categoryInput").value,method:$("methodInput").value,date:$("dateInput").value,note:$("noteInput").value.trim(),created:Date.now()});
-  save();$("expenseModal").classList.add("hidden");$("amountInput").value="";$("noteInput").value="";toast("Expense added");
+  save();$("expenseModal").classList.add("hidden");$("amountInput").value="";$("noteInput").value="";$("methodInput").value="";toast("Expense added");
+  const total=currentMonthExpenses().reduce((sum,x)=>sum+x.amount,0);showBudgetAlert("Expense added",`${money0(amount)} spent on ${$("categoryInput").value}. ${money0(Math.max(0,budget-total))} remains in your monthly budget.`);budgetStatus(total);
 };
 $("saveProfile").onclick=()=>{
   profile={name:$("nameInput").value.trim(),age:$("ageInput").value.trim(),gender:$("genderInput").value,phone:$("phoneInput").value.trim(),email:$("emailInput").value.trim(),city:$("cityInput").value.trim()};
@@ -113,5 +126,7 @@ $("saveProfile").onclick=()=>{
 };
 $("saveBudget").onclick=()=>{budget=Number($("budgetInput").value)||0;localStorage.setItem(BKEY,budget);$("budgetModal").classList.add("hidden");render();toast("Budget updated")};
 function escapeHtml(v){return String(v).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]))}
-render();
+render();applyTheme();
 window.addEventListener("resize",()=>{drawTrend();drawDonut(currentMonthExpenses())});
+$("exportDataBtn").onclick=()=>{const payload={app:"CashV",exportedAt:new Date().toISOString(),budget,profile,expenses};const blob=new Blob([JSON.stringify(payload,null,2)],{type:"application/json"});const a=document.createElement("a");a.href=URL.createObjectURL(blob);a.download="cashv-backup.json";a.click();URL.revokeObjectURL(a.href);toast("Backup exported")};
+$("clearDataBtn").onclick=()=>{if(confirm("Delete all CashV expenses, profile and budget data from this browser?")){localStorage.removeItem(KEY);localStorage.removeItem(BKEY);localStorage.removeItem(PKEY);expenses=[];budget=20000;profile={name:"",age:"",gender:"",phone:"",email:"",city:""};render();toast("All data cleared")}};

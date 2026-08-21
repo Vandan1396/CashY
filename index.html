@@ -19,14 +19,14 @@
         <div class="brand-mark" aria-hidden="true"><span>V</span><b>$</b></div>
         <strong>Cash<span>V</span></strong>
       </div>
-      <button class="top-icon" id="notifyBtn" aria-label="Notifications">♧</button>
+      <button class="top-icon" id="themeBtn" aria-label="Toggle light and dark mode">☾</button>
     </header>
 
     <main>
       <section class="screen active" id="homeScreen">
         <div class="greeting">
           <div>
-            <h1>Good <span id="dayPart">Morning</span>, <span id="greetName">Vandan</span> 👋</h1>
+            <h1>Good <span id="dayPart">Morning</span><span id="greetingNameWrap">, <span id="greetName"></span></span> 👋</h1>
             <p>Track your expenses and achieve your goals.</p>
           </div>
         </div>
@@ -93,6 +93,25 @@
         </section>
       </section>
 
+      <section class="screen" id="settingsScreen">
+        <div class="screen-head"><div><span class="eyebrow">PERSONALIZE</span><h1>Settings</h1></div></div>
+        <section class="panel settings-panel">
+          <div class="setting-row"><div><b>Appearance</b><small id="themeLabel">Dark mode</small></div><button class="toggle-btn" id="settingsThemeBtn">☾</button></div>
+          <div class="setting-row"><div><b>Budget alerts</b><small>Warn at 80% and 100% of your monthly budget</small></div><button class="toggle-switch active" id="budgetAlertsToggle" aria-label="Budget alerts"></button></div>
+          <div class="setting-row"><div><b>Browser notifications</b><small id="notifyLabel">Optional alerts for budget milestones</small></div><button class="primary-small" id="enableNotificationsBtn">Enable</button></div>
+        </section>
+        <section class="panel contact-panel">
+          <div class="panel-title"><h2>Contact Owner</h2><span class="small-label">Suggestions & reviews</span></div>
+          <p>If you have any suggestion, review, bug report or feature request, contact the owner directly.</p>
+          <a href="mailto:parekhvandan1306@gmail.com?subject=CashV%20Suggestion%20or%20Review">✉️ parekhvandan1306@gmail.com</a>
+          <a href="tel:+916359322237">📞 +91 63593 22237</a>
+        </section>
+        <section class="panel data-panel">
+          <div class="panel-title"><h2>Your Data</h2></div>
+          <div class="data-actions"><button class="secondary-btn" id="exportDataBtn">Export JSON</button><button class="danger-btn" id="clearDataBtn">Clear All Data</button></div>
+        </section>
+      </section>
+
       <section class="screen" id="profileScreen">
         <div class="profile-hero">
           <button class="top-icon light" id="profileBack">‹</button>
@@ -112,7 +131,7 @@
       <button class="nav-item active" data-screen="homeScreen"><span>⌂</span><small>Home</small></button>
       <button class="nav-item" data-screen="analyticsScreen"><span>⌁</span><small>Analytics</small></button>
       <button class="nav-item" data-screen="budgetScreen"><span>▣</span><small>Budget</small></button>
-      <button class="nav-item" data-screen="profileScreen"><span>♙</span><small>Profile</small></button>
+      <button class="nav-item" data-screen="profileScreen"><span>♙</span><small>Profile</small></button><button class="nav-item" data-screen="settingsScreen"><span>⚙</span><small>Settings</small></button>
     </nav>
   </div>
 
@@ -124,7 +143,7 @@
         <label>Category<select id="categoryInput">
           <option>Food & Dining</option><option>Transport</option><option>Shopping</option><option>Bills & Utilities</option><option>Health</option><option>Entertainment</option><option>Home</option><option>Others</option>
         </select></label>
-        <label>Payment<select id="methodInput"><option>UPI</option><option>Cash</option><option>Card</option><option>Bank</option></select></label>
+        <label>Payment<select id="methodInput"><option value="">Choose payment</option><option>UPI</option><option>Cash</option><option>Card</option><option>Bank</option></select></label>
       </div>
       <div class="two-col">
         <label>Date<input id="dateInput" type="date"></label>
