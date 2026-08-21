@@ -8,18 +8,16 @@
   <meta name="apple-mobile-web-app-capable" content="yes">
   <link rel="manifest" href="manifest.json">
   <link rel="icon" href="icons/icon-192.png">
-  <title>CashV — Expense Tracker</title>
-  <link rel="stylesheet" href="style.css">
+  <title>CashY — Expense Tracker</title>
+  <link rel="stylesheet" href="style.css?v=5">
 </head>
 <body>
   <div class="app-shell">
-    <header class="topbar">
-      <button class="top-icon" id="menuBtn" aria-label="Menu">☰</button>
+    <header class="topbar single-brand">
       <div class="brand">
         <div class="brand-mark" aria-hidden="true"><span>V</span><b>$</b></div>
         <strong>Cash<span>V</span></strong>
       </div>
-      <button class="top-icon" id="themeBtn" aria-label="Toggle light and dark mode">☾</button>
     </header>
 
     <main>
@@ -96,7 +94,7 @@
       <section class="screen" id="settingsScreen">
         <div class="screen-head"><div><span class="eyebrow">PERSONALIZE</span><h1>Settings</h1></div></div>
         <section class="panel settings-panel">
-          <div class="setting-row"><div><b>Appearance</b><small id="themeLabel">Dark mode</small></div><button class="toggle-btn" id="settingsThemeBtn">☾</button></div>
+          <div class="setting-row appearance-row"><div><b>Appearance</b><small id="themeLabel">Choose the theme for this device</small></div><div class="theme-choices" role="group" aria-label="Appearance"><button class="theme-choice" id="darkThemeBtn">Dark</button><button class="theme-choice" id="lightThemeBtn">Light</button></div></div>
           <div class="setting-row"><div><b>Budget alerts</b><small>Warn at 80% and 100% of your monthly budget</small></div><button class="toggle-switch active" id="budgetAlertsToggle" aria-label="Budget alerts"></button></div>
           <div class="setting-row"><div><b>Browser notifications</b><small id="notifyLabel">Optional alerts for budget milestones</small></div><button class="primary-small" id="enableNotificationsBtn">Enable</button></div>
         </section>
@@ -104,8 +102,7 @@
           <div class="panel-title"><h2>Contact Owner</h2><span class="small-label">Suggestions & reviews</span></div>
           <p>If you have any suggestion, review, bug report or feature request, contact the owner directly.</p>
           <a href="mailto:parekhvandan1306@gmail.com?subject=CashV%20Suggestion%20or%20Review">✉️ parekhvandan1306@gmail.com</a>
-          <a href="tel:+916359322237">📞 +91 63593 22237</a>
-        </section>
+                  </section>
         <section class="panel data-panel">
           <div class="panel-title"><h2>Your Data</h2></div>
           <div class="data-actions"><button class="secondary-btn" id="exportDataBtn">Export JSON</button><button class="danger-btn" id="clearDataBtn">Clear All Data</button></div>
@@ -177,7 +174,7 @@
   </div>
 
   <div class="toast hidden" id="toast"></div>
-  <script src="app.js"></script>
+  <script src="app.js?v=5"></script>
   <script>if("serviceWorker" in navigator){navigator.serviceWorker.register("sw.js");}</script>
 </body>
 </html>

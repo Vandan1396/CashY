@@ -16,7 +16,7 @@ function currentMonthExpenses(){return expenses.filter(x=>x.date?.slice(0,7)===m
 function save(){localStorage.setItem(KEY,JSON.stringify(expenses));render()}
 function fmtDate(s){if(!s)return "";return new Date(s+"T00:00:00").toLocaleDateString("en-IN",{day:"2-digit",month:"short",year:"numeric"})}
 function toast(msg){$("toast").textContent=msg;$("toast").classList.remove("hidden");setTimeout(()=>$("toast").classList.add("hidden"),2200)}
-function applyTheme(){document.body.classList.toggle("light",theme==="light");const icon=theme==="light"?"☀":"☾";$("themeBtn").textContent=icon;$("settingsThemeBtn").textContent=icon;$("themeLabel").textContent=theme==="light"?"Light mode":"Dark mode";localStorage.setItem("cashv_theme",theme);drawDonut(currentMonthExpenses());drawTrend()}
+function applyTheme(){document.body.classList.toggle("light",theme==="light");$("darkThemeBtn").classList.toggle("selected",theme==="dark");$("lightThemeBtn").classList.toggle("selected",theme==="light");$("themeLabel").textContent=theme==="light"?"Light appearance is active":"Dark appearance is active";document.querySelector("meta[name=theme-color]").setAttribute("content",theme==="light"?"#f4f7f5":"#0b1113");localStorage.setItem("cashv_theme",theme);drawDonut(currentMonthExpenses());drawTrend()}
 function showBudgetAlert(title,message){let old=document.querySelector(".budget-alert");if(old)old.remove();const box=document.createElement("div");box.className="budget-alert";box.innerHTML=`<h3>💰 ${title}</h3><p>${escapeHtml(message)}</p><button>Got it</button>`;box.querySelector("button").onclick=()=>box.remove();document.body.appendChild(box);setTimeout(()=>box.remove(),7000);if("Notification" in window&&Notification.permission==="granted"){new Notification("CashV — "+title,{body:message,icon:"icons/icon-192.png"})}}
 function budgetStatus(total){if(!budgetAlerts||budget<=0)return;const pct=total/budget*100;if(pct>=100){showBudgetAlert("Budget exceeded",`You have spent ${money0(total)} against your ${money0(budget)} monthly budget.`)}else if(pct>=80){showBudgetAlert("Budget warning",`You have used ${Math.round(pct)}% of your budget. ${money0(Math.max(0,budget-total))} is remaining.`)}}
 
@@ -27,9 +27,8 @@ function switchScreen(id){
   window.scrollTo({top:0,behavior:"smooth"});
 }
 document.querySelectorAll(".nav-item").forEach(b=>b.onclick=()=>switchScreen(b.dataset.screen));
-$("menuBtn").onclick=()=>switchScreen("settingsScreen");
-$("themeBtn").onclick=()=>{theme=theme==="dark"?"light":"dark";applyTheme()};
-$("settingsThemeBtn").onclick=()=>{theme=theme==="dark"?"light":"dark";applyTheme()};
+$("darkThemeBtn").onclick=()=>{theme="dark";applyTheme();toast("Dark appearance enabled")};
+$("lightThemeBtn").onclick=()=>{theme="light";applyTheme();toast("Light appearance enabled")};
 $("budgetAlertsToggle").onclick=()=>{budgetAlerts=!budgetAlerts;localStorage.setItem("cashv_budget_alerts",budgetAlerts?"on":"off");render();toast(budgetAlerts?"Budget alerts enabled":"Budget alerts disabled")};
 $("enableNotificationsBtn").onclick=async()=>{if(!(typeof Notification!=="undefined")){toast("Browser notifications are not supported here.");return}const perm=await Notification.requestPermission();$("notifyLabel").textContent=perm==="granted"?"Notifications enabled":"Notifications not enabled";toast(perm==="granted"?"Notifications enabled":"Notification permission not granted")};
 $("profileBack").onclick=()=>switchScreen("homeScreen");

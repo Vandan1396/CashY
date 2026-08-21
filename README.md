@@ -42,3 +42,12 @@ The application data is stored locally in the browser. It is not automatically s
 - Dark/light mode toggle.
 - Contact Owner section with email and phone.
 - JSON backup export and clear-data controls.
+
+
+## v5 changes
+- Removed the top menu and moon icons.
+- Appearance is now a clear Dark / Light selector in Settings.
+- Light mode has stronger visual overrides and updates browser theme color.
+- Removed owner mobile number; owner email remains.
+- Added cache versioning and network-first HTML loading so GitHub Pages updates are picked up more reliably.
+- Profile name remains empty for new users; greeting shows only the time-of-day until a user sets a name.
