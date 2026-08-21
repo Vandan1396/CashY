@@ -1,0 +1,164 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#0b1113">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <link rel="manifest" href="manifest.json">
+  <link rel="icon" href="icons/icon-192.png">
+  <title>CashV — Expense Tracker</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="app-shell">
+    <header class="topbar">
+      <button class="top-icon" id="menuBtn" aria-label="Menu">☰</button>
+      <div class="brand">
+        <div class="brand-mark" aria-hidden="true"><span>V</span><b>$</b></div>
+        <strong>Cash<span>V</span></strong>
+      </div>
+      <button class="top-icon" id="notifyBtn" aria-label="Notifications">♧</button>
+    </header>
+
+    <main>
+      <section class="screen active" id="homeScreen">
+        <div class="greeting">
+          <div>
+            <h1>Good <span id="dayPart">Morning</span>, <span id="greetName">Vandan</span> 👋</h1>
+            <p>Track your expenses and achieve your goals.</p>
+          </div>
+        </div>
+
+        <div class="hero-stats">
+          <article class="balance-card green-card">
+            <div class="card-icon">₹</div>
+            <div><span>Total Balance</span><strong id="balanceValue">₹0.00</strong></div>
+            <div class="mini-line">Available</div>
+          </article>
+          <article class="balance-card blue-card">
+            <div class="card-icon">↗</div>
+            <div><span>This Month Expense</span><strong id="monthExpenseValue">₹0.00</strong></div>
+            <div class="mini-line">Spending</div>
+          </article>
+        </div>
+
+        <section class="panel overview">
+          <div class="panel-title"><h2>This Month Overview</h2><button class="link-btn" id="monthLabel">Current month</button></div>
+          <div class="overview-grid">
+            <div class="donut-wrap">
+              <canvas id="donutChart" width="220" height="220"></canvas>
+              <div class="donut-center"><strong id="donutTotal">₹0</strong><span>Total</span></div>
+            </div>
+            <div class="category-list" id="categoryList"></div>
+          </div>
+        </section>
+
+        <section class="panel transactions">
+          <div class="panel-title"><h2>Recent Transactions</h2><button class="link-btn" id="viewAllBtn">View All</button></div>
+          <div id="transactionList"></div>
+        </section>
+      </section>
+
+      <section class="screen" id="analyticsScreen">
+        <div class="screen-head"><div><span class="eyebrow">INSIGHTS</span><h1>Analytics</h1></div></div>
+        <section class="panel">
+          <div class="panel-title"><h2>Spending trend</h2><span class="small-label">Last 7 days</span></div>
+          <div class="chart-box"><canvas id="trendChart" height="240"></canvas></div>
+        </section>
+        <section class="panel">
+          <div class="panel-title"><h2>Category breakdown</h2></div>
+          <div id="analyticsRows"></div>
+        </section>
+        <section class="insight-card">
+          <div class="insight-icon">✦</div>
+          <div><h3>Smart insight</h3><p id="insightText">Add expenses to unlock your spending insight.</p></div>
+        </section>
+      </section>
+
+      <section class="screen" id="budgetScreen">
+        <div class="screen-head"><div><span class="eyebrow">PLAN AHEAD</span><h1>Budget</h1></div></div>
+        <section class="panel budget-panel">
+          <div class="budget-top"><div><span>Monthly budget</span><strong id="budgetValue">₹20,000</strong></div><div class="budget-badge" id="budgetPercent">0%</div></div>
+          <div class="progress"><i id="budgetProgress"></i></div>
+          <div class="budget-meta"><span id="spentLabel">₹0 spent</span><span id="leftLabel">₹20,000 left</span></div>
+          <button class="primary-btn" id="changeBudgetBtn">Change Budget</button>
+        </section>
+        <section class="panel">
+          <div class="panel-title"><h2>Budget tips</h2></div>
+          <div class="tip"><b>50/30/20</b><span>Needs / wants / savings</span></div>
+          <div class="tip"><b>Review weekly</b><span>Catch overspending early</span></div>
+          <div class="tip"><b>Small wins</b><span>Every saved rupee counts</span></div>
+        </section>
+      </section>
+
+      <section class="screen" id="profileScreen">
+        <div class="profile-hero">
+          <button class="top-icon light" id="profileBack">‹</button>
+          <span>Profile</span><button class="top-icon light" id="profileEdit">✎</button>
+          <div class="profile-cover"></div>
+          <div class="profile-avatar" id="profileAvatar">V</div>
+          <h1 id="profileName">Vandan Parekh</h1>
+          <p>Track your profile details</p>
+        </div>
+        <section class="profile-list" id="profileList"></section>
+      </section>
+    </main>
+
+    <button class="add-fab" id="addExpenseBtn"><span>＋</span><b>Add expense</b></button>
+
+    <nav class="bottom-nav">
+      <button class="nav-item active" data-screen="homeScreen"><span>⌂</span><small>Home</small></button>
+      <button class="nav-item" data-screen="analyticsScreen"><span>⌁</span><small>Analytics</small></button>
+      <button class="nav-item" data-screen="budgetScreen"><span>▣</span><small>Budget</small></button>
+      <button class="nav-item" data-screen="profileScreen"><span>♙</span><small>Profile</small></button>
+    </nav>
+  </div>
+
+  <div class="modal hidden" id="expenseModal">
+    <div class="sheet">
+      <div class="sheet-head"><h2>Add Expense</h2><button class="close-btn" data-close="expenseModal">×</button></div>
+      <label>Amount<input id="amountInput" type="number" min="0" step="0.01" inputmode="decimal" placeholder="₹ 0"></label>
+      <div class="two-col">
+        <label>Category<select id="categoryInput">
+          <option>Food & Dining</option><option>Transport</option><option>Shopping</option><option>Bills & Utilities</option><option>Health</option><option>Entertainment</option><option>Home</option><option>Others</option>
+        </select></label>
+        <label>Payment<select id="methodInput"><option>UPI</option><option>Cash</option><option>Card</option><option>Bank</option></select></label>
+      </div>
+      <div class="two-col">
+        <label>Date<input id="dateInput" type="date"></label>
+        <label>Note<input id="noteInput" maxlength="60" placeholder="Coffee, Uber, grocery..."></label>
+      </div>
+      <button class="primary-btn" id="saveExpense">Save Expense</button>
+    </div>
+  </div>
+
+  <div class="modal hidden" id="profileModal">
+    <div class="sheet">
+      <div class="sheet-head"><h2>Edit Profile</h2><button class="close-btn" data-close="profileModal">×</button></div>
+      <label>Name<input id="nameInput" maxlength="60" placeholder="Your name"></label>
+      <div class="two-col">
+        <label>Age<input id="ageInput" type="number" min="1" max="120" inputmode="numeric"></label>
+        <label>Gender<select id="genderInput"><option value="">Prefer not to say</option><option>Male</option><option>Female</option><option>Other</option></select></label>
+      </div>
+      <label>Phone<input id="phoneInput" type="tel" inputmode="tel" placeholder="+91"></label>
+      <label>Email<input id="emailInput" type="email" placeholder="you@example.com"></label>
+      <label>City<input id="cityInput" maxlength="50" placeholder="City, State"></label>
+      <button class="primary-btn" id="saveProfile">Save Profile</button>
+    </div>
+  </div>
+
+  <div class="modal hidden" id="budgetModal">
+    <div class="sheet">
+      <div class="sheet-head"><h2>Monthly Budget</h2><button class="close-btn" data-close="budgetModal">×</button></div>
+      <label>Budget<input id="budgetInput" type="number" min="0" step="100" inputmode="decimal"></label>
+      <button class="primary-btn" id="saveBudget">Save Budget</button>
+    </div>
+  </div>
+
+  <div class="toast hidden" id="toast"></div>
+  <script src="app.js"></script>
+  <script>if("serviceWorker" in navigator){navigator.serviceWorker.register("sw.js");}</script>
+</body>
+</html>
