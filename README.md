@@ -1,4 +1,4 @@
-# CashV — Smart Personal Expense Tracker
+# CashY — Smart Personal Expense Tracker
 
 A premium, responsive expense-tracking Progressive Web App inspired by the supplied CashV/VandWise UI reference.
 
