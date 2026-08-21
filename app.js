@@ -20,15 +20,17 @@ function applyTheme(){document.body.classList.toggle("light",theme==="light");$(
 function showBudgetAlert(title,message){let old=document.querySelector(".budget-alert");if(old)old.remove();const box=document.createElement("div");box.className="budget-alert";box.innerHTML=`<h3>💰 ${title}</h3><p>${escapeHtml(message)}</p><button>Got it</button>`;box.querySelector("button").onclick=()=>box.remove();document.body.appendChild(box);setTimeout(()=>box.remove(),7000);if("Notification" in window&&Notification.permission==="granted"){new Notification("CashV — "+title,{body:message,icon:"icons/icon-192.png"})}}
 function budgetStatus(total){if(!budgetAlerts||budget<=0)return;const pct=total/budget*100;if(pct>=100){showBudgetAlert("Budget exceeded",`You have spent ${money0(total)} against your ${money0(budget)} monthly budget.`)}else if(pct>=80){showBudgetAlert("Budget warning",`You have used ${Math.round(pct)}% of your budget. ${money0(Math.max(0,budget-total))} is remaining.`)}}
 
+function track(eventName){ if(window.cashvAnalytics) window.cashvAnalytics.event(eventName); }
+
 function switchScreen(id){
   document.querySelectorAll(".screen").forEach(s=>s.classList.toggle("active",s.id===id));
   document.querySelectorAll(".nav-item").forEach(b=>b.classList.toggle("active",b.dataset.screen===id));
   $("addExpenseBtn").style.display=id==="homeScreen"?"flex":"none";
   window.scrollTo({top:0,behavior:"smooth"});
 }
-document.querySelectorAll(".nav-item").forEach(b=>b.onclick=()=>switchScreen(b.dataset.screen));
-$("darkThemeBtn").onclick=()=>{theme="dark";applyTheme();toast("Dark appearance enabled")};
-$("lightThemeBtn").onclick=()=>{theme="light";applyTheme();toast("Light appearance enabled")};
+document.querySelectorAll(".nav-item").forEach(b=>b.onclick=()=>{ track("navigation-"+b.dataset.screen.replace("Screen","")); switchScreen(b.dataset.screen); });
+$("darkThemeBtn").onclick=()=>{theme="dark";applyTheme();track("theme-dark");toast("Dark appearance enabled")};
+$("lightThemeBtn").onclick=()=>{theme="light";applyTheme();track("theme-light");toast("Light appearance enabled")};
 $("budgetAlertsToggle").onclick=()=>{budgetAlerts=!budgetAlerts;localStorage.setItem("cashv_budget_alerts",budgetAlerts?"on":"off");render();toast(budgetAlerts?"Budget alerts enabled":"Budget alerts disabled")};
 $("enableNotificationsBtn").onclick=async()=>{if(!(typeof Notification!=="undefined")){toast("Browser notifications are not supported here.");return}const perm=await Notification.requestPermission();$("notifyLabel").textContent=perm==="granted"?"Notifications enabled":"Notifications not enabled";toast(perm==="granted"?"Notifications enabled":"Notification permission not granted")};
 $("profileBack").onclick=()=>switchScreen("homeScreen");
@@ -116,16 +118,16 @@ $("saveExpense").onclick=()=>{
   const amount=Number($("amountInput").value);if(!amount||amount<0){toast("Enter a valid amount.");return}
   if(!$("methodInput").value){toast("Please choose a payment method.");$("methodInput").focus();return}
   expenses.push({amount,category:$("categoryInput").value,method:$("methodInput").value,date:$("dateInput").value,note:$("noteInput").value.trim(),created:Date.now()});
-  save();$("expenseModal").classList.add("hidden");$("amountInput").value="";$("noteInput").value="";$("methodInput").value="";toast("Expense added");
+  save();track("expense-added");$("expenseModal").classList.add("hidden");$("amountInput").value="";$("noteInput").value="";$("methodInput").value="";toast("Expense added");
   const total=currentMonthExpenses().reduce((sum,x)=>sum+x.amount,0);showBudgetAlert("Expense added",`${money0(amount)} spent on ${$("categoryInput").value}. ${money0(Math.max(0,budget-total))} remains in your monthly budget.`);budgetStatus(total);
 };
 $("saveProfile").onclick=()=>{
   profile={name:$("nameInput").value.trim(),age:$("ageInput").value.trim(),gender:$("genderInput").value,phone:$("phoneInput").value.trim(),email:$("emailInput").value.trim(),city:$("cityInput").value.trim()};
-  localStorage.setItem(PKEY,JSON.stringify(profile));$("profileModal").classList.add("hidden");render();toast("Profile updated");
+  localStorage.setItem(PKEY,JSON.stringify(profile));track("profile-updated");$("profileModal").classList.add("hidden");render();toast("Profile updated");
 };
-$("saveBudget").onclick=()=>{budget=Number($("budgetInput").value)||0;localStorage.setItem(BKEY,budget);$("budgetModal").classList.add("hidden");render();toast("Budget updated")};
+$("saveBudget").onclick=()=>{budget=Number($("budgetInput").value)||0;localStorage.setItem(BKEY,budget);track("budget-updated");$("budgetModal").classList.add("hidden");render();toast("Budget updated")};
 function escapeHtml(v){return String(v).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]))}
-render();applyTheme();
+render();applyTheme();track("app-open");
 window.addEventListener("resize",()=>{drawTrend();drawDonut(currentMonthExpenses())});
 $("exportDataBtn").onclick=()=>{const payload={app:"CashV",exportedAt:new Date().toISOString(),budget,profile,expenses};const blob=new Blob([JSON.stringify(payload,null,2)],{type:"application/json"});const a=document.createElement("a");a.href=URL.createObjectURL(blob);a.download="cashv-backup.json";a.click();URL.revokeObjectURL(a.href);toast("Backup exported")};
 $("clearDataBtn").onclick=()=>{if(confirm("Delete all CashV expenses, profile and budget data from this browser?")){localStorage.removeItem(KEY);localStorage.removeItem(BKEY);localStorage.removeItem(PKEY);expenses=[];budget=20000;profile={name:"",age:"",gender:"",phone:"",email:"",city:""};render();toast("All data cleared")}};

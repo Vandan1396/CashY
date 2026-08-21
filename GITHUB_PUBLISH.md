@@ -1,4 +1,4 @@
-# CashY — GitHub Upload Guide
+# CashV — GitHub Upload Guide
 
 Upload the contents of this folder to your new GitHub repository.
 

@@ -1,4 +1,4 @@
-# CashY — Smart Personal Expense Tracker
+# CashV — Smart Personal Expense Tracker
 
 A premium, responsive expense-tracking Progressive Web App inspired by the supplied CashV/VandWise UI reference.
 
@@ -51,3 +51,7 @@ The application data is stored locally in the browser. It is not automatically s
 - Removed owner mobile number; owner email remains.
 - Added cache versioning and network-first HTML loading so GitHub Pages updates are picked up more reliably.
 - Profile name remains empty for new users; greeting shows only the time-of-day until a user sets a name.
+
+
+## Privacy-friendly Owner Analytics
+See `OWNER_ANALYTICS.md`. Analytics are disabled until you add your own GoatCounter site code to `analytics.js`.
